@@ -73,7 +73,6 @@ class DoubleFetchChecker : public Checker<check::Location,
 										check::Bind,
 										check::PreCall,
 										check::PostCall,
-										check::PostStmt<ReturnStmt> ,
 										check::PostStmt<Expr>,
 										check::PreStmt<Expr>,
 										check::PreStmt<CallExpr>,
@@ -101,7 +100,7 @@ public:
 	void checkPostStmt(const CallExpr *CE, CheckerContext &Ctx) const;
 
 	void checkPreStmt(const Expr *E, CheckerContext &Ctx) const;
-	void checkPostStmt(const const Expr *E, CheckerContext &Ctx) const;
+	void checkPostStmt(const Expr *E, CheckerContext &Ctx) const;
 
 	void checkBind(SVal loc, SVal val,const Stmt *StoreE,CheckerContext &Ctx) const;
 	void checkLocation(SVal loc, bool isLoad, const Stmt* LoadS, CheckerContext &Ctx) const;
@@ -181,9 +180,9 @@ void DoubleFetchChecker::checkPreStmt(const Expr *E, CheckerContext &Ctx) const 
 
 }
 void DoubleFetchChecker::checkPostStmt(const Expr *E, CheckerContext &Ctx) const {
-	/*
+
 	ProgramStateRef state = Ctx.getState();
-	SVal ExpVal = state->getSVal(E->IgnoreParens(), Ctx.getLocationContext());
+	/*	SVal ExpVal = state->getSVal(E->IgnoreParens(), Ctx.getLocationContext());
 	if(state->isTainted(E, Ctx.getLocationContext())){
 		std::cout<<"[checkPostStmt<Expr>] state is tainted"<<std::endl;
 	}
@@ -480,28 +479,42 @@ void DoubleFetchChecker::checkBranchCondition(const Stmt *Condition,
 	    	SVal lsval = state->getSVal(lp, Ctx.getLocationContext());
 
 	    	if(!isUntainted(state,rsval)){
-	    		std::cout<<"[checkBranch]"<<"\ttainted, rsval is, \t ";
+	    		std::cout<<"[checkBranch]"<<"\ttainted, binary rsval is, \t ";
 	    		showTaintTags(state, rsval);
 	    		unsigned int tag = this->getCurTag(state, rsval);
 	    		state = state->add<BranchTaintingState>(tag);
 	    		Ctx.addTransition(state);
 	    	}
 	    	 else
-	    		std::cout<<"[checkBranch] not tainted"<<"\trsval is:"<<toStr(rsval)<<std::endl;
+	    		std::cout<<"[checkBranch] not tainted"<<"\tbinary rsval is:"<<toStr(rsval)<<std::endl;
 
 	    	if(!isUntainted(state,lsval)){
-				std::cout<<"[checkBranch]"<<"\ttainted, lsval is,  \t ";
+				std::cout<<"[checkBranch]"<<"\ttainted, binary lsval is,  \t ";
 				showTaintTags(state, lsval);
 				unsigned int tag = this->getCurTag(state, lsval);
 				state = state->add<BranchTaintingState>(tag);
 				Ctx.addTransition(state);
 			}
 			 else
-				std::cout<<"[checkBranch] not tainted"<<"\tlsval is:"<<toStr(lsval)<<std::endl;
+				std::cout<<"[checkBranch] not tainted"<<"\tbinary lsval is:"<<toStr(lsval)<<std::endl;
 
 	    }
 	  }
+	else if (const UnaryOperator *U = dyn_cast<UnaryOperator>(Condition)){
+		Expr* sp = U->getSubExpr();
+		SVal ssval = state->getSVal(sp, Ctx.getLocationContext());
 
+		if(!isUntainted(state,ssval)){
+			std::cout<<"[checkBranch]"<<"\ttainted, unary ssval is, \t ";
+			showTaintTags(state, ssval);
+			unsigned int tag = this->getCurTag(state, ssval);
+			state = state->add<BranchTaintingState>(tag);
+			Ctx.addTransition(state);
+		}
+		 else
+			std::cout<<"[checkBranch] not tainted"<<"\tunary ssval is:"<<toStr(ssval)<<std::endl;
+
+	}
 
 
 
@@ -715,10 +728,12 @@ ProgramStateRef DoubleFetchChecker::passTaint(ProgramStateRef state, SVal src, S
 
 
 
-std::string DoubleFetchChecker::toStr(SVal val) const{
+std::string DoubleFetchChecker::toStr(const SVal &val) const{
 	std::string str;
 	llvm::raw_string_ostream rso(str);
+	std::cout << "toStr 1" << std::endl;
 	val.dumpToStream(rso);
+	std::cout << "toStr 2" << std::endl;
 	return rso.str();
 }
 
