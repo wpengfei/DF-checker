@@ -24,4 +24,16 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>checkers/DoubleFetchChecker.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/work/llvm/tools/clang/lib/StaticAnalyzer/Checkers/DoubleFetchChecker.cpp</locationURI>
+		</link>
+		<link>
+			<name>checkers/TaintStructs.h</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/work/llvm/tools/clang/lib/StaticAnalyzer/Checkers/TaintStructs.h</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>

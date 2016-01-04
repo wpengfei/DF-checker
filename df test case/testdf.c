@@ -16,28 +16,18 @@ typedef struct test_message{
 
 
 void kernel_func(MSG *uptr){
-	/*char* o;
-	char c;
-	printf("aa%s", uptr->msg);
-	printf("aa%s", uptr->msglength);
-	o = uptr->msg;
-	c = uptr->msg[0];*/
 
-	char * localbuffer =(char*) malloc(uptr->msglength);
-	if (localbuffer != NULL) {
-		memcpy(localbuffer, uptr->msg, uptr->msglength);
-	}
-	printf("Kernel() Copied msg is %s\n", localbuffer);
-/*
-	char* buffer2;
-	buffer2 = localbuffer;
-	if (!buffer2){
-		printf("buffer2 is null\n");
+	char * localbuffer =(char*) malloc(uptr->msglength);//t0 ,t0
+	if (localbuffer != NULL){//t0
+		memcpy(localbuffer, uptr->msg, uptr->msglength);//t0, t1, t2
 	}
 	else{
-		printf("assigned msg is %s\n", buffer2);
+		printf("1");
+
 	}
-*/
+
+	printf("Kernel() Copied msg is %s\n", localbuffer);
+
 	free(localbuffer);
 
 }
