@@ -38,6 +38,46 @@ std::string toStr(const Stmt* s) {
 }
 
 
+typedef struct STATE_struct{
+private:
+	unsigned int count;
+	bool isLocalvar;
+	unsigned int tag;
+public:
+	STATE_struct(unsigned int c = 0, bool b = false, unsigned int t = 0){
+		count = c;
+		isLocalvar = b;
+		tag = t;
+	}
+	STATE_struct(){
+		count = 0;
+		isLocalvar = false;
+		tag = 0;
+	}
+	unsigned int getCount() const{
+		return count;
+	}
+	unsigned int getTag() const{
+		return tag;
+	}
+	STATE_struct getAsIncre() const { return STATE_struct(count+1, isLocalvar, tag);}
+	STATE_struct getAsLocal() const { return STATE_struct(count, true, tag);}
+
+	bool isLocal() const {return this->isLocalvar;}
+	bool operator == ( const STATE_struct &T) const{
+		if (count == T.count)
+			return true;
+		else
+			return false;
+	}
+	void Profile(llvm::FoldingSetNodeID &ID) const {
+		ID.AddInteger(count);
+		ID.AddInteger(tag);
+		ID.AddBoolean(isLocalvar);
+	}
+
+}STATE;
+
 typedef struct TAINT_struct{
 public:
 	mutable unsigned int tag;
@@ -327,14 +367,17 @@ typedef struct BranchList_struct{
 typedef struct Arg_struct{
 	std::string argName;
 	std::string funcName;
+	std::string argType;
 public:
 	Arg_struct() {
 		argName = "";
 		funcName = "";
+		argType = "";
 	}
-	Arg_struct(std::string func, std::string arg) {
+	Arg_struct(std::string func, std::string arg, std::string type) {
 		argName = arg;
 		funcName = func;
+		argType = type;
 	}
 } ARG;
 
@@ -360,6 +403,14 @@ public:
 				return true;
 		}
 		return false;
+	}
+	void showArgs() const{
+		std::list<ARG>::iterator i;
+
+		for (i = alist.begin(); i != alist.end(); i++){
+			std::cout<<"[show args]"<<"func name: "<<(*i).funcName<<"\targName:"<<(*i).argName<<"\targType:"<<(*i).argType<<std::endl;
+		}
+
 	}
 
 

@@ -232,7 +232,7 @@ void DoubleFetchChecker::checkASTDecl(const FunctionDecl *D, AnalysisManager &Mg
 	std::string arg;
 	int argNum = D->getNumParams();
 	for (int i = 0; i < argNum; i++ ){
-		arg = funcArg = D->parameters()[0]->getQualifiedNameAsString();
+		arg = D->parameters()[i]->getQualifiedNameAsString();
 		ARG a(func, arg);
 		this->AL.Add(a);
 	}

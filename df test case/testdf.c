@@ -14,17 +14,14 @@ typedef struct test_message{
 	unsigned int msglength ;
 } MSG;
 
-
+// test case for basic pattern A
 void kernel_func(MSG *uptr){
 
 	char * localbuffer =(char*) malloc(uptr->msglength);//t0 ,t0
 	if (localbuffer != NULL){//t0
 		memcpy(localbuffer, uptr->msg, uptr->msglength);//t0, t1, t2
 	}
-	else{
-		printf("1");
 
-	}
 
 	printf("Kernel() Copied msg is %s\n", localbuffer);
 
