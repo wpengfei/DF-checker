@@ -1,7 +1,7 @@
 /*
- * tesecase2.c
+ * testcase4.c
  *
- *  Created on: 2016年1月5日
+ *  Created on: 2016年1月26日
  *      Author: wpf
  */
 
@@ -11,24 +11,16 @@
 
 typedef struct test_message{
 	char msg[20];
+	char *msgptr;
 	unsigned int msglength ;
 } MSG;
 
 // test case to distinguish  multiple function with multiple parameters
+void copy_msg(MSG *uptr, char* str){
 
-void kernel_func1(MSG *uptr, char* str1, int x){
-	unsigned int len = uptr->msglength;// t0, t0
-	unsigned int len2 = len +2;// t0, t0
-	unsigned int len3 = len2 +2;
-
-	if (len2 > 0)
-		len2 = uptr->msglength;
-
-	printf("len %d", len2);
-}
-
-void kernel_func2(MSG *uptr, char* str){
-
+	if (uptr->msgptr){
+		printf("ss%c", uptr->msgptr);
+	}
 
 	char * localbuffer =(char*) malloc(uptr->msglength);//t1, t1
 	if (localbuffer != NULL){ //t1
@@ -38,5 +30,23 @@ void kernel_func2(MSG *uptr, char* str){
 	free(localbuffer);
 
 }
+
+void kernel_func1(MSG *uptr, char* str1, int x){
+	if (uptr){
+		copy_msg(uptr,str1);
+	}
+	printf("ss%s", str1);
+}
+
+int func1(int s){
+	printf("ss%d", s);
+	return 1;
+}
+
+int func2(char *t){
+	printf("ss%c", t);
+	return 1;
+}
+
 
 

@@ -41,17 +41,20 @@ std::string toStr(const Stmt* s) {
 typedef struct STATE_struct{
 private:
 	unsigned int count;
-	bool isLocalvar;
+	bool isLocal;
+	bool isBase;
 	unsigned int tag;
 public:
-	STATE_struct(unsigned int c = 0, bool b = false, unsigned int t = 0){
+	STATE_struct(unsigned int c = 0, bool l = false, bool b =false, unsigned int t = 0){
 		count = c;
-		isLocalvar = b;
+		isLocal = l;
+		isBase = b;
 		tag = t;
 	}
 	STATE_struct(){
 		count = 0;
-		isLocalvar = false;
+		isLocal = false;
+		isBase = false;
 		tag = 0;
 	}
 	unsigned int getCount() const{
@@ -60,12 +63,16 @@ public:
 	unsigned int getTag() const{
 		return tag;
 	}
-	STATE_struct getAsIncre() const { return STATE_struct(count+1, isLocalvar, tag);}
-	STATE_struct getAsLocal() const { return STATE_struct(count, true, tag);}
-
-	bool isLocal() const {return this->isLocalvar;}
+	STATE_struct getAsIncre() const { return STATE_struct(count+1, isLocal, isBase, tag);}
+	STATE_struct getAsLocal() const { return STATE_struct(count, true, isBase, tag);}
+	STATE_struct getAsBase() const { return STATE_struct(count, isLocal, true, tag);}
+	void showState(std::string str = "") const {
+		std::cout<<str<<"\tcount: "<<count<<"\tisLocal: "<<isLocal<<"\tisBase: "<<isBase<<"\ttaint: "<<tag<<std::endl;
+	}
+	bool isLocalvar() const {return this->isLocal;}
+	bool isBaseSpace() const {return this->isBase;}
 	bool operator == ( const STATE_struct &T) const{
-		if (count == T.count)
+		if (count == T.count && isLocal == T.isLocal && isBase == T.isBase && tag == T.tag)
 			return true;
 		else
 			return false;
@@ -73,7 +80,8 @@ public:
 	void Profile(llvm::FoldingSetNodeID &ID) const {
 		ID.AddInteger(count);
 		ID.AddInteger(tag);
-		ID.AddBoolean(isLocalvar);
+		ID.AddBoolean(isLocal);
+		ID.AddBoolean(isBase);
 	}
 
 }STATE;
@@ -395,11 +403,11 @@ public:
 		else
 			return false;
 	}
-	bool contains(std::string arg) const{
+	bool contains(std::string arg, std::string func) const{
 		std::list<ARG>::iterator i;
 		for (i = alist.begin(); i != alist.end(); ++i)
 		{
-			if ((*i).argName == arg)
+			if ((*i).argName == arg && (*i).funcName == func)
 				return true;
 		}
 		return false;
