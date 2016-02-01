@@ -19,11 +19,12 @@ void kernel_func(MSG *uptr, char* msgstr){
 
 	unsigned int len = uptr->msglength;// t0, t0
 	unsigned int len2 = len +2;// t0, t0
-	unsigned int len3 = len2 +2;
+
 
 	char * localbuffer =(char*) malloc(uptr->msglength);//t1, t1
+
 	if (localbuffer != NULL){ //t1
-		memcpy(localbuffer, msgstr, len3);// t1,t2,t0
+		memcpy(localbuffer, msgstr, len2);// t1,t2,t0
 
 	}
 	printf("Kernel() Copied msg is %s\n", localbuffer);

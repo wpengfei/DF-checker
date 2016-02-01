@@ -38,9 +38,12 @@ void kernel_func2(MSG *uptr, char* str){
 
 
 	char * localbuffer =(char*) malloc(uptr->msglength);//t1, t1
-	if (localbuffer != NULL){ //t1
+	if (localbuffer){ //t1
 		memcpy(localbuffer, str, uptr->msglength);// t1,t2,t0
 	}
+
+	char* pp = *localbuffer;
+
 
 	free(localbuffer);
 

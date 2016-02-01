@@ -40,48 +40,56 @@ std::string toStr(const Stmt* s) {
 
 typedef struct STATE_struct{
 private:
+	std::string name;
+	SVal val;
 	unsigned int count;
-	bool isLocal;
-	bool isBase;
-	unsigned int tag;
+	unsigned int taint;
+	bool isLoc;
+	bool isPtr;
+	//bool isBase;
+
 public:
-	STATE_struct(unsigned int c = 0, bool l = false, bool b =false, unsigned int t = 0){
+	STATE_struct(std::string n, SVal v, unsigned int c, int t = 0, bool l = false, bool p = false){
+		name = n;
+		val = v;
 		count = c;
-		isLocal = l;
-		isBase = b;
-		tag = t;
+		taint = t;
+		isLoc = l;
+		isPtr = p;
 	}
-	STATE_struct(){
-		count = 0;
-		isLocal = false;
-		isBase = false;
-		tag = 0;
-	}
+
 	unsigned int getCount() const{
 		return count;
 	}
-	unsigned int getTag() const{
-		return tag;
+	unsigned int getTaint() const{
+		return taint;
 	}
-	STATE_struct getAsIncre() const { return STATE_struct(count+1, isLocal, isBase, tag);}
-	STATE_struct getAsLocal() const { return STATE_struct(count, true, isBase, tag);}
-	STATE_struct getAsBase() const { return STATE_struct(count, isLocal, true, tag);}
+	bool isLocal() const{
+		return isLoc;
+	}
+	bool isPointer() const{
+		return isPtr;
+	}
+	STATE_struct getAsIncre() const { return STATE_struct(name, val, count+1, taint, isLoc, isPtr);}
+
 	void showState(std::string str = "") const {
-		std::cout<<str<<"\tcount: "<<count<<"\tisLocal: "<<isLocal<<"\tisBase: "<<isBase<<"\ttaint: "<<tag<<std::endl;
+		std::cout<<str<<" name: "<<name<<"\tval: "<<toStr(val)<<"\tcount: "<<count<<"\ttaint: "<<taint
+				<<"\tisLoc: "<<isLoc<<"\tisPtr: "<<isPtr<<std::endl;
 	}
-	bool isLocalvar() const {return this->isLocal;}
-	bool isBaseSpace() const {return this->isBase;}
+
 	bool operator == ( const STATE_struct &T) const{
-		if (count == T.count && isLocal == T.isLocal && isBase == T.isBase && tag == T.tag)
+		if (count == T.count && name == T.name && val == T.val
+				&& taint == T.taint && isLoc == T.isLoc && isPtr == T.isPtr)
 			return true;
 		else
 			return false;
 	}
 	void Profile(llvm::FoldingSetNodeID &ID) const {
 		ID.AddInteger(count);
-		ID.AddInteger(tag);
-		ID.AddBoolean(isLocal);
-		ID.AddBoolean(isBase);
+		ID.AddInteger(taint);
+		ID.AddBoolean(isLoc);
+		ID.AddBoolean(isPtr);
+
 	}
 
 }STATE;
