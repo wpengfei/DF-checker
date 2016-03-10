@@ -32,12 +32,16 @@ int func_main(int* m){
 	int n = *m;
 	func2(m);
 
-	int *p;
-	p = m;
+	if(m){
+		int *p;
+		p = m;
 
-	func1(p);
+		func1(p);
+	}
 
-	printf("func main :%d",*p);
+	func2(m);
+
+	printf("func main :%d",*m);
 
 
 }
